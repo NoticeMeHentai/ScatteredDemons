@@ -1,0 +1,110 @@
+﻿        - - - POOLING SYSTEM - - -
+
+    :: GENERAL INFORMATION
+    
+Documentation for the pooling system, this includes as of february 2019:
+Pooling.cs - IPoolable.cs - SendBackToPool.cs
+
+Author: Andres Maldonado -- Original Author: Martin "quill18"
+Based on this code https://gist.github.com/quill18/5a7cfffae68892621267
+Don't forget to give credit to me as well as the original author.
+
+    :: USAGE
+    
+Instead of: Instantiate(yourPrefab, position, rotation);
+Call: Pooling.GetFromPool(yourPrefab, position, rotation);
+
+Instead of: Destroy(yourGameObject);
+Call: Pooling.SendToPool(yourGameObject);
+
+* Objects that were not spawned from a pool are destroyed instead, a message
+    on the console should confirm this.
+* Destroying an object with delay is not yet supported. i.e. Destroy(yourGO, 3f);
+* All pools are dynamic, they will resize if a new instance is needed. To reduce
+    the impact use Pooling.Preload().
+
+    :: ADVANCED USAGE
+    
+    - CALLING FUNCTIONS ON POOL SPAWN / UNSPAWN -
+This could be used for resetting an enemy health, or leaving something behind
+when the enemy disapears.
+In your script use the interface IPoolable then implement it like this:
+
+public class Enemy : MonoBehavior, IPoolable {
+
+    <...your code...>
+    
+    public void OnPoolSpawn() {
+        // - Code to be run after this object is spawned
+    }
+    public void OnPoolUnSpawn() {
+        // - Code to be run before this object is unspawned
+    }
+}
+
+* IPoolable script should be used by a MonoBehaviour and must be on the root
+ of the prefab, not on any child object.
+ 
+    - PRELOAD OBJECTS -
+Could be be used in the beginning of the game to reduce the cost of creating
+a new instance of your prefab. Use:
+
+Pooling.Preload(prefabReference, 8);
+
+* Does not return anything.
+* Cannot use Pooling Categories.
+* Pools are always dynamic, they will resize if a new instance is needed.
+
+    - POOL CATEGORIES -
+Objects that are used between levels can be organized inside categories, all
+marked as DontDestroyOnLoad. Use:
+
+Pooling.GetFromPool(prefab, pos, rot, Pooling.Category.Projectiles);
+
+* Current existing categories are: Projectiles, Enemies, VisualEffects.
+* Again, objects spawned with this method are marked as DontDestroyOnLoad.
+
+    - KNOW IF A GAME OBJECT COMES FROM A POOL -
+You can use GetComponent<PoolMember>() to check if the object comes from the
+pooling system. Inside you can have access to the collection of interfaces
+IPoolable that the object uses or the boolean usesInterfaces.
+* There are some exposed function that is better not to touch them because
+    they are used to call the interfaces and reference its parent pool.
+    
+     
+    :: CHANGELOG
+
+[fev2019] v2.5.5 // ANDRES
++ More Documentation
+- IPoolable has been simplified
+- PoolMemberhas been simplified
+
+v2.5 [fev2019] // ANDRES
+:: ScenePools.cs
+- Removed from project
+:: Pooling.cs
++ Integrated Categories
++ Addded documentation
++ Clean Up
+
+v2.1 [jan2019] // ANDRES
++ Removed debug logs and minor fixes
+
+v2.0 [dec2018] // ANDRES
++ ScenePools.cs, organizes spawn object into transforms in the scene
++ Added Pools Presets
++ Multiple IPoolable compatibility
+
+v1.6 [aug2018] // ANDRES
++ Mayor Fixes to all the system
++ Commentatries and summaries
+
+v1.5 [aug2018] // ANDRES
++ IPoolable corrections
++ Particle System Pooling, SendBackToPool.cs
+
+v1.2 [jul2018] // ANDRES
++ IPoolable interface compatibility
+
+v1 [jun2018] // Andres - Martin "quill18"
++ Simple Pooling, Pool Member
